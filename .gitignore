@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+venv/
+env/
+nlp/
+
+# Data files (quá lớn)
+data/raw/*.parquet
+data/raw/*.csv
+data/processed/*.csv
+data/features/*.npy
+data/features/*.pkl
+
+# Keep structure
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/features/.gitkeep
+
+# Models
+*.pkl
+*.h5
+*.pth
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Evaluation results
+evaluation_report.csv
