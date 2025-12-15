@@ -1,0 +1,37 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Book Card Styling */
+.book-card {
+    background-color: #f0f2f6;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    transition: transform 0.2s;
+}
+
+.book-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Metric/Score Styling */
+.metric-container {
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+/* Button Styling */
+.stButton > button {
+    width: 100%;
+    border-radius: 5px;
+    font-weight: bold;
+}

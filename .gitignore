@@ -17,6 +17,8 @@ data/raw/*.csv
 data/processed/*.csv
 data/features/*.npy
 data/features/*.pkl
+data/features/*.npz
+
 
 # Keep structure
 !data/raw/.gitkeep

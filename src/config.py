@@ -31,6 +31,7 @@ class Config:
     
     # Feature files (precomputed)
     BOOK_EMBEDDINGS = os.path.join(FEATURES_DIR, "book_embeddings_5field.npz")
+    BOOK_EMBEDDINGS_2 = os.path.join(FEATURES_DIR, "book_embeddings.npy")
     BOOK_IDS = os.path.join(FEATURES_DIR, "book_ids.pkl")
     BOOK_KEYWORDS = os.path.join(FEATURES_DIR, "book_keywords.pkl")
     BOOK_ENTITIES = os.path.join(FEATURES_DIR, "book_entities.pkl")
