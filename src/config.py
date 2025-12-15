@@ -30,7 +30,7 @@ class Config:
     RATINGS_MATRIX = os.path.join(PROCESSED_DATA_DIR, "ratings_matrix.npz")
     
     # Feature files (precomputed)
-    BOOK_EMBEDDINGS = os.path.join(FEATURES_DIR, "book_embeddings.npy")
+    BOOK_EMBEDDINGS = os.path.join(FEATURES_DIR, "book_embeddings_5field.npz")
     BOOK_IDS = os.path.join(FEATURES_DIR, "book_ids.pkl")
     BOOK_KEYWORDS = os.path.join(FEATURES_DIR, "book_keywords.pkl")
     BOOK_ENTITIES = os.path.join(FEATURES_DIR, "book_entities.pkl")

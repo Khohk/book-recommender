@@ -1,6 +1,6 @@
 """
 Script 03: Test Hybrid Scoring
-Compare Pure SBERT vs Hybrid (SBERT + Keywords + Entities)
+Compare Pure SBERT vs Hybrid (SBERT + Keywords + Impact)
 """
 
 import sys
@@ -35,7 +35,7 @@ def display_comparison(query, pure_results, hybrid_results, top_k=5):
     print("="*100)
     
     print("\n" + "-"*100)
-    print(f"{'PURE SBERT':<50} | {'HYBRID (SBERT + KW + ENT)':<50}")
+    print(f"{'PURE SBERT':<50} | {'HYBRID (SBERT + KW + IMPACT)':<50}")
     print("-"*100)
     
     for i in range(top_k):
@@ -63,28 +63,48 @@ def display_comparison(query, pure_results, hybrid_results, top_k=5):
     
     print("-"*100)
 
-def display_hybrid_details(result):
+def display_hybrid_details(result, weights=None):
     """
-    Display detailed breakdown of hybrid scoring
+    Display detailed breakdown of hybrid scoring (UPDATED)
+    Uses actual weights instead of hardcoded percentages
     """
+    # Get weights from result or use defaults
+    if weights is None:
+        weights = {
+            'similarity': 0.50,
+            'keywords': 0.20,
+            'category': 0.15,
+            'entities': 0.05,
+            'impact': 0.10
+        }
+    
     print(f"\nTitle: {result['title']}")
     print(f"Author: {result['author']}")
     print(f"Categories: {result['categories']}")
+    print(f"Rating: {result.get('avg_rating', 'N/A')} ({result.get('num_ratings', 0)} ratings)")
     
     print(f"\n[SCORES]")
     print(f"  Final Score:  {result['final_score']:.4f}")
-    print(f"  - Similarity: {result['scores_breakdown']['similarity']:.4f} (70%)")
-    print(f"  - Keywords:   {result['scores_breakdown']['keywords']:.4f} (20%)")
-    print(f"  - Entities:   {result['scores_breakdown']['entities']:.4f} (10%)")
+    
+    # Display with ACTUAL weights (not hardcoded)
+    breakdown = result['scores_breakdown']
+    
+    # Convert weights to percentages
+    sim_pct = int(weights.get('similarity', 0.5) * 100)
+    kw_pct = int(weights.get('keywords', 0.2) * 100)
+    cat_pct = int(weights.get('category', 0.15) * 100)
+    ent_pct = int(weights.get('entities', 0.05) * 100)
+    imp_pct = int(weights.get('impact', 0.1) * 100)
+    
+    print(f"  - Similarity: {breakdown['similarity']:.4f} ({sim_pct}%)")
+    print(f"  - Keywords:   {breakdown['keywords']:.4f} ({kw_pct}%)")
+    print(f"  - Category:   {breakdown['category']:.4f} ({cat_pct}%)")
+    print(f"  - Entities:   {breakdown['entities']:.4f} ({ent_pct}%)")
+    print(f"  - Impact:     {breakdown['impact']:.4f} ({imp_pct}%)")
     
     if result.get('matched_keywords'):
         print(f"\n[MATCHED KEYWORDS]")
         print(f"  {', '.join(result['matched_keywords'])}")
-    
-    if result.get('matched_entities'):
-        print(f"\n[MATCHED ENTITIES]")
-        for ent_type, ents in result['matched_entities'].items():
-            print(f"  {ent_type}: {', '.join(ents)}")
     
     # Description preview
     desc = result.get('description', '')
@@ -94,7 +114,7 @@ def display_hybrid_details(result):
 
 def main():
     print("="*100)
-    print("[TEST] HYBRID SCORING SYSTEM")
+    print("[TEST] HYBRID SCORING SYSTEM (with Impact Score)")
     print("="*100)
     
     # Load processed data
@@ -102,15 +122,37 @@ def main():
     df = pd.read_csv(config.BOOKS_PROCESSED)
     print(f"[OK] Loaded {len(df)} books")
     
+    # Check if impact-related columns exist
+    required_cols = ['avg_rating', 'num_ratings']
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        print(f"[WARNING] Missing columns for impact score: {missing_cols}")
+        print(f"[INFO] Available columns: {df.columns.tolist()}")
+    else:
+        print(f"[OK] Impact score columns found")
+    
     # Initialize NLP retrieval
-    print("\n[*] Initializing NLP Retrieval model...")
+    print("\n[*] Initializing NLP Retrieval model (multi-field)...")
     retrieval = NLPRetrieval()
-    retrieval.fit(df)
+    
+    # Try to load pre-computed embeddings
+    embeddings_path = config.BOOK_EMBEDDINGS
+    
+    if os.path.exists(embeddings_path):
+        print(f"[*] Loading pre-computed embeddings from: {embeddings_path}")
+        retrieval.df = df  # Set dataframe first
+        retrieval.model = retrieval.model or __import__('sentence_transformers').SentenceTransformer(retrieval.model_name)
+        retrieval.load_embeddings(embeddings_path)
+    else:
+        print("[WARNING] Multi-field embeddings not found!")
+        print(f"[ACTION] Please run: python scripts/01_create_multifield_embeddings.py")
+        print("[*] Falling back to creating embeddings now...")
+        retrieval.fit(df)
     
     # Initialize hybrid scorer
     print("\n[*] Initializing Hybrid Scorer...")
     scorer = HybridScorer(retrieval)
-    print("[OK] Hybrid scorer ready")
+    print(f"[OK] Hybrid scorer ready (weights: {scorer.weights})")
     
     # ========================================
     # MODE SELECTION
@@ -165,13 +207,13 @@ def main():
             print(f"{'#'*100}")
             print(f"QUERY: '{query}'")
             
-            # Get candidates
+            # Get candidates (with auto strategy)
             print("\n[1/2] Retrieving candidates...")
-            candidates = retrieval.search(query, top_k=20)
+            candidates = retrieval.search(query, top_k=20, strategy='auto')
             
             # Score with hybrid
             print("[2/2] Hybrid scoring...")
-            results = scorer.score(query, candidates)
+            results = scorer.score(query, candidates, strategy='auto')
             
             # Display top 3 with details
             print("\n" + "="*100)
@@ -182,7 +224,7 @@ def main():
                 print(f"\n{'-'*100}")
                 print(f"[RANK #{rank}]")
                 print(f"{'-'*100}")
-                display_hybrid_details(result)
+                display_hybrid_details(result, weights=scorer.weights)
             
             if i < len(TEST_QUERIES):
                 input("\n[PAUSE] Press Enter to continue...")
@@ -211,6 +253,9 @@ def main():
                 'query': query,
                 'top_1_title': results[0]['title'],
                 'top_1_score': results[0]['final_score'],
+                'top_1_sim': results[0]['scores_breakdown']['similarity'],
+                'top_1_cat': results[0]['scores_breakdown']['category'],
+                'top_1_rating': results[0].get('avg_rating', 'N/A'),
                 'top_1_categories': results[0]['categories']
             })
             
@@ -260,7 +305,7 @@ def main():
             print(f"\n{'-'*100}")
             print(f"[RANK #{rank}]")
             print(f"{'-'*100}")
-            display_hybrid_details(result)
+            display_hybrid_details(result, weights=scorer.weights)
         
         print()
     
