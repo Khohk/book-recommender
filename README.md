@@ -2,7 +2,7 @@
 
 Hệ thống gợi ý sách thông minh sử dụng NLP + Hybrid Ranking + Cross-sell
 
-## 🎯 Features
+##  Features
 - **NLP Retrieval**: SBERT semantic search + NER + KeyBERT
 - **Hybrid Ranking**: Content + Keywords + Entities + Impact Score
 - **Cross-sell**: Item-Item similarity recommendations
@@ -10,7 +10,7 @@ Hệ thống gợi ý sách thông minh sử dụng NLP + Hybrid Ranking + Cross
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Clone Repository
 ```bash
@@ -46,19 +46,9 @@ conda activate nlp-book-rec
 
 ### 3. Download Data
 
-⚠️ **Data files không có trên Git (quá lớn)**
-
-**Cách 1: Download từ Google Drive (Recommended)**
-```
-Link: [Your Google Drive Link Here]
-Tải về và giải nén vào thư mục `data/`
-```
-
-
 
 ## 📂 Data Structure
 
-Sau khi download/generate, cấu trúc thư mục `data/` cần như sau:
 ```
 data/
 ├── raw/
@@ -104,7 +94,7 @@ streamlit run webapp/app.py --server.runOnSave true
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 ### Test NLP Retrieval
 ```bash
@@ -125,7 +115,7 @@ streamlit run webapp/app.py
 
 ---
 
-## 📊 Project Structure
+##  Project Structure
 ```
 ├── src/                  # Core modules
 │   ├── preprocessing/    # Data loading & cleaning
@@ -140,7 +130,7 @@ streamlit run webapp/app.py
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Issue 1: `ModuleNotFoundError: No module named 'src'`
 ```bash
@@ -170,14 +160,3 @@ EMBEDDING_BATCH_SIZE = 8  # Default: 16
 
 ---
 
-## 📞 Contact
-
-- **Person 1 (NLP)**: [Your Name] - [Email/Discord]
-- **Person 2 (CF)**: [Name] - [Contact]
-- **Person 3 (UI)**: [Name] - [Contact]
-
----
-
-## 📝 License
-
-MIT License - See LICENSE file for details
